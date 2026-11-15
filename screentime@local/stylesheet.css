@@ -1,0 +1,46 @@
+/* Solid cards, no blur. Light by default; `.sct-dark` on the root switches the palette. */
+
+.sct-card {
+    border-radius: 28px;
+    background-color: #ffffff;
+    color: #15171c;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30);
+}
+.sct-dark .sct-card { background-color: #17181d; color: #f3f4f6; }
+
+/* ---- rectangle */
+.sct-rect { padding: 0; }
+.sct-rect-main { padding: 14px 8px 10px 16px; spacing: 4px; }
+.sct-header { spacing: 8px; }
+.sct-avatar { width: 28px; height: 28px; border-radius: 14px; background-color: #e4ddfb; color: #5b3fc4; }
+.sct-dark .sct-avatar { background-color: #3a3170; color: #cfc4ff; }
+.sct-total { font-size: 24px; font-weight: 500; }
+.sct-axis { width: 28px; padding-left: 4px; }
+.sct-axis-label { font-size: 9px; color: #5b6270; }
+.sct-dark .sct-axis-label { color: #a3a9b5; }
+.sct-xaxis { padding-right: 28px; }
+.sct-rect-side {
+    background-color: #f0f1f4;
+    padding: 14px 14px;
+    border-radius: 0 28px 28px 0;
+}
+.sct-dark .sct-rect-side { background-color: #202229; }
+.sct-app-row { spacing: 8px; }
+.sct-app-time { font-size: 11px; color: #4a5060; }
+.sct-dark .sct-app-time { color: #c3c8d2; }
+
+/* ---- square */
+.sct-square { padding: 16px; spacing: 0; }
+.sct-title { font-size: 11px; font-weight: bold; color: #5b6270; }
+.sct-dark .sct-title { color: #a3a9b5; }
+.sct-big { font-size: 32px; font-weight: 500; }
+.sct-small { font-size: 10px; color: #4a5060; }
+.sct-dark .sct-small { color: #c3c8d2; }
+.sct-limit-row { padding-bottom: 4px; }
+.sct-track { border-radius: 3px; background-color: #eceef2; }
+.sct-dark .sct-track { background-color: #2c2f38; }
+.sct-fill { border-radius: 3px; background-color: #2f6bff; }
+.sct-dark .sct-fill { background-color: #5b8cff; }
+.sct-fill-over, .sct-dark .sct-fill-over { background-color: #e5484d; }
+.sct-top-app { spacing: 8px; padding-top: 10px; }
+.sct-app-name { font-size: 11px; font-weight: bold; }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.screentime" path="/org/gnome/shell/extensions/screentime/">
+
+    <key name="layout" type="s">
+      <choices>
+        <choice value="both"/>
+        <choice value="rectangle"/>
+        <choice value="square"/>
+      </choices>
+      <default>"both"</default>
+      <summary>Which widgets to show</summary>
+    </key>
+    <key name="theme" type="s">
+      <choices>
+        <choice value="light"/>
+        <choice value="dark"/>
+      </choices>
+      <default>"light"</default>
+      <summary>Card color scheme</summary>
+    </key>
+    <key name="daily-limit-minutes" type="i">
+      <range min="30" max="1440"/>
+      <default>360</default>
+      <summary>Daily limit shown on the square widget, in minutes</summary>
+    </key>
+    <key name="idle-seconds" type="i">
+      <range min="30" max="900"/>
+      <default>120</default>
+      <summary>Stop counting after this many seconds without keyboard or mouse input</summary>
+    </key>
+
+    <key name="offset-right" type="i">
+      <range min="0" max="4000"/>
+      <default>24</default>
+      <summary>Distance from the right edge of the primary monitor, in pixels</summary>
+    </key>
+    <key name="offset-top" type="i">
+      <range min="0" max="4000"/>
+      <default>450</default>
+      <summary>Distance from the top of the primary monitor, in pixels</summary>
+    </key>
+    <key name="locked" type="b">
+      <default>false</default>
+      <summary>Disable dragging the widgets with the mouse</summary>
+    </key>
+
+  </schema>
+</schemalist>

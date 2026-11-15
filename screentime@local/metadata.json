@@ -1,0 +1,8 @@
+{
+  "uuid": "screentime@local",
+  "name": "Screen Time",
+  "description": "A macOS-style Screen Time widget for the desktop. Tracks which app has focus (event-driven, no polling) and shows today's usage as a wide card and a square card.",
+  "shell-version": ["50", "51"],
+  "settings-schema": "org.gnome.shell.extensions.screentime",
+  "version": 1
+}
