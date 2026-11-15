@@ -18,7 +18,8 @@
 .sct-axis { width: 28px; padding-left: 4px; }
 .sct-axis-label { font-size: 9px; color: #5b6270; }
 .sct-dark .sct-axis-label { color: #a3a9b5; }
-.sct-xaxis { padding-right: 28px; }
+/* Reserve the y-axis column (.sct-axis: 28px wide + 4px padding) so labels line up with the chart. */
+.sct-xaxis { padding-right: 32px; }
 .sct-rect-side {
     background-color: #f0f1f4;
     padding: 14px 14px;

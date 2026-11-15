@@ -31,17 +31,25 @@ export class Store {
         if (this._key === key)
             return this._day;
         this.save();
+        const path = this._path(key);
         let day = null;
-        try {
-            const [ok, bytes] = GLib.file_get_contents(this._path(key));
-            if (ok)
+        if (GLib.file_test(path, GLib.FileTest.EXISTS)) {
+            try {
+                const [, bytes] = GLib.file_get_contents(path);
                 day = JSON.parse(new TextDecoder().decode(bytes));
-        } catch (_e) {
-            // No file yet, or unreadable: start a fresh day.
+                if (!day || !Array.isArray(day.hours) || day.hours.length !== 24)
+                    throw new Error('unexpected format');
+            } catch (e) {
+                // Keep the bad file for inspection instead of silently overwriting it.
+                console.warn(`screentime: ${path} is unreadable (${e.message}); moved aside, starting the day fresh`);
+                GLib.rename(path, `${path}.corrupt`);
+                day = null;
+            }
         }
-        if (!day || !Array.isArray(day.hours) || day.hours.length !== 24)
-            day = emptyDay();
-        day.names ??= {};
+        day ??= emptyDay();
+        day.hours = day.hours.map(b => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}));
+        if (!day.names || typeof day.names !== 'object')
+            day.names = {};
         this._key = key;
         this._day = day;
         this._dirty = false;
@@ -96,7 +104,7 @@ export class Store {
             const dir = GLib.Dir.open(this._dir, 0);
             let name;
             while ((name = dir.read_name()) !== null) {
-                if (/^\d{4}-\d{2}-\d{2}\.json$/.test(name) && name.slice(0, 10) < cutoff)
+                if (/^\d{4}-\d{2}-\d{2}\.json(\.corrupt)?$/.test(name) && name.slice(0, 10) < cutoff)
                     GLib.unlink(GLib.build_filenamev([this._dir, name]));
             }
             dir.close();

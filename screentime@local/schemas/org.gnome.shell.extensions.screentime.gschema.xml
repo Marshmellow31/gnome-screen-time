@@ -31,12 +31,12 @@
     </key>
 
     <key name="offset-right" type="i">
-      <range min="0" max="4000"/>
+      <range min="0" max="20000"/>
       <default>24</default>
       <summary>Distance from the right edge of the primary monitor, in pixels</summary>
     </key>
     <key name="offset-top" type="i">
-      <range min="0" max="4000"/>
+      <range min="0" max="20000"/>
       <default>450</default>
       <summary>Distance from the top of the primary monitor, in pixels</summary>
     </key>

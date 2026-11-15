@@ -8,6 +8,10 @@ import {Store, dateKey} from './store.js';
 import {Tracker} from './tracker.js';
 import {RectCard, SquareCard, GAP} from './widgets.js';
 
+// Must match the <range max> of offset-right / offset-top in the schema.
+const MAX_OFFSET = 20000;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
 export default class ScreenTimeExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
@@ -55,6 +59,9 @@ export default class ScreenTimeExtension extends Extension {
         this._rect?.destroy();
         this._root?.destroy();
         this._root = null;
+        this._rect = null;
+        this._square = null;
+        this._drag = null;
         this._store = null;
         this._settings = null;
     }
@@ -108,10 +115,14 @@ export default class ScreenTimeExtension extends Extension {
         if (!monitor)
             return;
         const scale = this._scale();
-        const [width] = this._root.get_size();
-        const [x, y] = this._root.get_position();
-        this._settings.set_int('offset-right', Math.max(0, Math.round((monitor.x + monitor.width - width - x) / scale)));
-        this._settings.set_int('offset-top', Math.max(0, Math.round((y - monitor.y) / scale)));
+        const [width, height] = this._root.get_size();
+        let [x, y] = this._root.get_position();
+        // Offsets are relative to the primary monitor: keep a drop that strays off it (onto
+        // another monitor, or past an edge) on the primary instead of snapping back.
+        x = clamp(x, monitor.x, monitor.x + monitor.width - width);
+        y = clamp(y, monitor.y, monitor.y + monitor.height - height);
+        this._settings.set_int('offset-right', clamp(Math.round((monitor.x + monitor.width - width - x) / scale), 0, MAX_OFFSET));
+        this._settings.set_int('offset-top', clamp(Math.round((y - monitor.y) / scale), 0, MAX_OFFSET));
         this._place();
     }
 }

@@ -118,7 +118,9 @@ class HourChart {
                     perCat[categoryOf(id)] += secs;
                 let y = h - 1;
                 for (let c = 0; c < 4; c++) {
-                    const barH = Math.min(perCat[c] / 3600, 1) * (h - 1);
+                    // Clamp to the space left in the column: an hour can hold more than 60 min
+                    // (the repeated hour when clocks go back), and must not draw past the top.
+                    const barH = Math.min(perCat[c] / 3600 * (h - 1), y);
                     if (barH < 0.5)
                         continue;
                     cr.setSourceRGBA(...CATEGORY_COLORS[c], 1);
@@ -135,21 +137,23 @@ class HourChart {
 // ---------------------------------------------------------------- rectangle (2 x 1)
 
 const TOP_APPS = 4;
+const SIDE_WIDTH = 100;
 
 export class RectCard {
     constructor() {
         this.actor = new St.BoxLayout({
             style_class: 'sct-card sct-rect',
-            width: CELL * 2 + GAP,
-            height: CELL,
+            // Sizes go through CSS (content box) so St applies the UI scale factor to them,
+            // the same way it does to padding and fonts. .sct-rect has no padding.
+            style: `width: ${CELL * 2 + GAP}px; height: ${CELL}px;`,
         });
 
         const left = new St.BoxLayout({style_class: 'sct-rect-main', orientation: Clutter.Orientation.VERTICAL, x_expand: true});
 
         const header = new St.BoxLayout({style_class: 'sct-header'});
         const avatar = new St.Bin({style_class: 'sct-avatar', y_align: Clutter.ActorAlign.CENTER});
-        avatar.set_child(new St.Icon({icon_name: 'avatar-default-symbolic', icon_size: 16}));
         this._avatar = avatar;
+        this._showAvatarGlyph();
         this._watchAvatar();
         this._total = label('sct-total');
         header.add_child(avatar);
@@ -172,7 +176,8 @@ export class RectCard {
             xAxis.add_child(new St.Label({text, style_class: 'sct-axis-label', x_expand: true}));
         left.add_child(xAxis);
 
-        const right = new St.BoxLayout({style_class: 'sct-rect-side', orientation: Clutter.Orientation.VERTICAL, width: 100});
+        // 100px wide overall; .sct-rect-side has 14px of horizontal padding on each side.
+        const right = new St.BoxLayout({style_class: 'sct-rect-side', orientation: Clutter.Orientation.VERTICAL, style: `width: ${SIDE_WIDTH - 28}px;`});
         this._rows = [];
         for (let i = 0; i < TOP_APPS; i++) {
             const row = new St.BoxLayout({style_class: 'sct-app-row', y_expand: true, y_align: Clutter.ActorAlign.CENTER});
@@ -201,8 +206,11 @@ export class RectCard {
         }
         const apply = () => {
             const path = this._user.get_icon_file();
-            if (!path || !GLib.file_test(path, GLib.FileTest.EXISTS))
+            if (!path || !GLib.file_test(path, GLib.FileTest.EXISTS)) {
+                // No picture, or it was removed since we last looked.
+                this._showAvatarGlyph();
                 return;
+            }
             this._avatar.set_child(null);
             this._avatar.set_style(`background-image: url("file://${path}"); background-size: cover; background-color: transparent;`);
         };
@@ -211,6 +219,12 @@ export class RectCard {
         else
             this._userIds.push(this._user.connect('notify::is-loaded', apply));
         this._userIds.push(this._user.connect('changed', apply));
+    }
+
+    _showAvatarGlyph() {
+        this._avatar.set_style(null);
+        if (!this._avatar.get_child())
+            this._avatar.set_child(new St.Icon({icon_name: 'avatar-default-symbolic', icon_size: 16}));
     }
 
     destroy() {
@@ -242,8 +256,8 @@ export class SquareCard {
         this.actor = new St.BoxLayout({
             style_class: 'sct-card sct-square',
             orientation: Clutter.Orientation.VERTICAL,
-            width: CELL,
-            height: CELL,
+            // CELL overall; .sct-square has 16px padding on every side.
+            style: `width: ${CELL - 32}px; height: ${CELL - 32}px;`,
         });
 
         this._title = label('sct-title', 'Screen Time');
@@ -263,8 +277,8 @@ export class SquareCard {
         limitRow.add_child(this._limitLeft);
         this.actor.add_child(limitRow);
 
-        this._track = new St.Widget({style_class: 'sct-track', width: TRACK_WIDTH, height: 6, layout_manager: new Clutter.BinLayout()});
-        this._fill = new St.Widget({style_class: 'sct-fill', height: 6, x_align: Clutter.ActorAlign.START});
+        this._track = new St.Widget({style_class: 'sct-track', style: `width: ${TRACK_WIDTH}px; height: 6px;`, layout_manager: new Clutter.BinLayout()});
+        this._fill = new St.Widget({style_class: 'sct-fill', style: 'width: 0px; height: 6px;', x_align: Clutter.ActorAlign.START});
         this._track.add_child(this._fill);
         this.actor.add_child(this._track);
 
@@ -288,7 +302,7 @@ export class SquareCard {
         this._limitLeft.text = over
             ? `Over limit by ${formatDuration(summary.total - limit)}`
             : `${formatDuration(limit - summary.total)} left of ${formatDuration(limit)} limit`;
-        this._fill.width = Math.round(TRACK_WIDTH * Math.min(1, summary.total / limit));
+        this._fill.set_style(`width: ${Math.round(TRACK_WIDTH * Math.min(1, summary.total / limit))}px; height: 6px;`);
         this._fill.style_class = over ? 'sct-fill sct-fill-over' : 'sct-fill';
 
         const top = summary.apps[0];
