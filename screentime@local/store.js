@@ -3,7 +3,8 @@
 // A whole day is a few KB, so no database is needed. Only today's file is held in memory.
 import GLib from 'gi://GLib';
 
-const RETENTION_DAYS = 90;
+// Two years: enough for month-over-month and yearly views in the app (a day is a few KB).
+const RETENTION_DAYS = 730;
 const pad = n => String(n).padStart(2, '0');
 
 export function dateKey(ms) {

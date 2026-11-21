@@ -13,7 +13,7 @@ One GNOME Shell extension does both the tracking and the drawing.
 - Focus changes come from Mutter's `notify::focus-window` signal, so nothing polls.
 - `Meta.IdleMonitor` pauses counting after an idle timeout (default 120 s). Counting also pauses while the screen is locked.
 - One 30 s timer saves usage and redraws the widgets.
-- Usage is stored as one small JSON file per day in `~/.local/share/screentime/` (seconds per app per hour). Files older than 90 days are deleted.
+- Usage is stored as one small JSON file per day in `~/.local/share/screentime/` (seconds per app per hour). Files older than two years are deleted.
 
 Only the focused app is recorded: no window titles, no keystrokes, nothing leaves your machine.
 
@@ -33,6 +33,25 @@ gnome-extensions enable screentime@local
 ```
 
 Settings (layout, colors, daily limit, idle timeout, position) are in the Extensions app.
+
+## The Screen Time app
+
+`app/` is a small GTK 4 / libadwaita app (run by `gjs`, nothing to build) that reads the same files and shows the full history:
+
+- **Today:** total vs. your daily average, an hour-by-hour strip, each app with a 7-day sparkline, and where the time went by category.
+- **Week:** the week as a calendar (one column per day, one cell per hour) plus top apps and categories.
+- **Month:** one ring per day (full ring = 12 hours), records and category totals.
+- **Rhythm:** your average day as a 24-hour clock, a weekday × hour heat map, and facts such as your busiest and quietest hours.
+
+Hover anything for details; click a day in Week or Month to open it. `Alt+←/→` moves between days, weeks or months, `Alt+1…4` switches pages and `Ctrl+R` refreshes (it also refreshes every minute).
+
+Add it to the app grid and pin it to the dock:
+
+```bash
+sh app/install.sh            # or: sh app/install.sh --no-pin
+```
+
+Or run it straight from the folder with `gjs -m app/main.js`.
 
 ## Status
 
